@@ -52,7 +52,7 @@ def main():
     """This method invokes the training functions for development purposes"""
 
     # Read data from a file
-    data_df = pd.read_csv('porto_seguro_safe_driver_prediction_input.csv')
+    #data_df = pd.read_csv('porto_seguro_safe_driver_prediction_input')
 
     # Hard code the parameters for training the model
     parameters = {
