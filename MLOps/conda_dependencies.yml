@@ -19,7 +19,7 @@ dependencies:
   # The python interpreter version.
   # Currently Azure ML Workbench only supports 3.5.2 and later.
   - python=3.7.*
-  - lightgbm
+  
   - pip
 
   - pip:
@@ -33,6 +33,7 @@ dependencies:
       # Training deps
       - scikit-learn
       - azureml-dataprep
+      - lightgbm
 
       # Scoring deps
       - inference-schema[numpy-support]
