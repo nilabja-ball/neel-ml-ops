@@ -89,7 +89,7 @@ parser.add_argument(
 parser.add_argument(
     "--allow_run_cancel",
     type=str,
-    help="Set this to false to avoid evaluation step from cancelling run after an unsuccessful evaluation",  # NOQA: E501
+    help="Set this to false to avoid evaluation step from cancelling",  
     default="true",
 )
 
@@ -157,7 +157,7 @@ try:
                     print("New trained model performs better, "
                           "thus it should be registered")
                 else:
-                    print("New trained model F1 score is worse than or equal to "
+                    print("New trained model F1 score is worse than or eq to"
                           "production model so skipping model registration.")
                     cancel_run = True
             else:
