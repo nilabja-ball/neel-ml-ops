@@ -111,7 +111,7 @@ try:
     firstRegistration = False
     tag_name = 'experiment_name'
 
-    model = get_latest_model(
+    model = get_model(
         model_name, tag_name, exp.name, ws)
 
     cancel_run = False
