@@ -26,7 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 from azureml.core import Run
 import argparse
 import traceback
-from util.model_helper import get_latest_model
+from util.model_helper import get_model
 
 run = Run.get_context()
 
