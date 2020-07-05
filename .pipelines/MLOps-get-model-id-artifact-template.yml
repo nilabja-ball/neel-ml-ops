@@ -35,9 +35,6 @@ steps:
       script: |
         # Print JSON
         cat $(Build.SourcesDirectory)/bin/model/model.json | jq '.'
-        echo " Build Direct $(Build.SourcesDirectory)"
-        echo "Branch $(Build.SourceBranch)"
-        echo "BuildID ${{ parameters.artifactBuildId }}"
 
         # Set model name and version variables
         MODEL_NAME=$(jq -r '.name' <$(Build.SourcesDirectory)/bin/model/model.json)
