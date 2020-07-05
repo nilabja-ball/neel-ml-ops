@@ -11,10 +11,9 @@ dependencies:
     # dependencies for MLOps with R.
   - r=3.6.0
   - r-essentials=3.6.0
-
   - conda-forge::jq
   - pip=20.0.*
-
+  - lightgbm
   - pip:
       # dependencies with versions aligned with conda_dependencies.yml.
       - azureml-sdk==1.6.*
