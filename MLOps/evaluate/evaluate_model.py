@@ -26,7 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 from azureml.core import Run
 import argparse
 import traceback
-from util.model_helper import get_model
+from util.model_helper import get_latest_model
 
 run = Run.get_context()
 
@@ -34,7 +34,7 @@ run = Run.get_context()
 # the following code is a good starting point for you
 # use
 # python -m evaluate.evaluate_model
-# in MLOps folder context
+# in safedriver folder context
 
 # if (run.id.startswith('OfflineRun')):
 #     from dotenv import load_dotenv
@@ -42,10 +42,10 @@ run = Run.get_context()
 #     load_dotenv()
 #     sources_dir = os.environ.get("SOURCES_DIR_TRAIN")
 #     if (sources_dir is None):
-#         sources_dir = 'MLOps'
+#         sources_dir = 'safedriver'
 #     path_to_util = os.path.join(".", sources_dir, "util")
 #     sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
-#     from model_helper import get_model
+#     from model_helper import get_latest_model
 #     workspace_name = os.environ.get("WORKSPACE_NAME")
 #     experiment_name = os.environ.get("EXPERIMENT_NAME")
 #     resource_group = os.environ.get("RESOURCE_GROUP")
@@ -83,7 +83,7 @@ parser.add_argument(
     "--model_name",
     type=str,
     help="Name of the Model",
-    default="MLOps_model.pkl",
+    default="sklearn_regression_model.pkl",
 )
 
 parser.add_argument(
@@ -99,47 +99,76 @@ if (args.run_id is not None):
 if (run_id == 'amlcompute'):
     run_id = run.parent.id
 model_name = args.model_name
-metric_eval = "mse"
+auc_metric = "auc"
+f1_score_metric = "f1score"
 
 allow_run_cancel = args.allow_run_cancel
+print("allow_run_cancel")
+print(allow_run_cancel)
 # Parameterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
 try:
     firstRegistration = False
     tag_name = 'experiment_name'
 
-    model = get_model(
-                model_name=model_name,
-                tag_name=tag_name,
-                tag_value=exp.name,
-                aml_workspace=ws)
+    model = get_latest_model(
+        model_name, tag_name, exp.name, ws)
+
+    cancel_run = False
 
     if (model is not None):
-        production_model_mse = 10000
-        if (metric_eval in model.tags):
-            production_model_mse = float(model.tags[metric_eval])
-        new_model_mse = float(run.parent.get_metrics().get(metric_eval))
-        if (production_model_mse is None or new_model_mse is None):
-            print("Unable to find", metric_eval, "metrics, "
-                  "exiting evaluation")
-            if((allow_run_cancel).lower() == 'true'):
-                run.parent.cancel()
-        else:
-            print(
-                "Current Production model mse: {}, "
-                "New trained model mse: {}".format(
-                    production_model_mse, new_model_mse
-                )
-            )
 
-        if (new_model_mse < production_model_mse):
-            print("New trained model performs better, "
-                  "thus it should be registered")
+        new_model_run = run.parent
+        new_model_auc = float(new_model_run.get_metrics().get(auc_metric))
+        new_model_f1score = float(
+            new_model_run.get_metrics().get(f1_score_metric))  # NOQA: E501
+
+        if (new_model_auc is not None) and (new_model_f1score is not None):
+
+            if (auc_metric in model.tags):
+                production_model_auc = float(model.tags[auc_metric])
+
+                print(
+                    "Current Production model auc: {}, "
+                    "New trained model auc: {}".format(
+                        production_model_auc, new_model_auc
+                    )
+                )
+
+                if (new_model_auc < production_model_auc):
+                    print("New trained model performs better, "
+                          "thus it should be registered")
+                else:
+                    print("New trained model metric is worse than or equal to "
+                          "production model so skipping model registration.")
+                    cancel_run = True
+
+            if (f1_score_metric in model.tags):
+                production_model_f1score = float(model.tags[f1_score_metric])
+
+                print(
+                    "Current Production model F1 score: {}, "
+                    "New trained model F1 score: {}".format(
+                        production_model_f1score, new_model_f1score
+                    )
+                )
+                # Modify eval condition based how F1 is calculated.
+                if (new_model_f1score < production_model_f1score):
+                    print("New trained model performs better, "
+                          "thus it should be registered")
+                else:
+                    print("New trained model F1 score is worse than or equal to "
+                          "production model so skipping model registration.")
+                    cancel_run = True
+            else:
+                print("Unable to find", f1_score_metric, "metrics, "
+
+                      "exiting evaluation and registering a new model")
         else:
-            print("New trained model metric is worse than or equal to "
-                  "production model so skipping model registration.")
-            if((allow_run_cancel).lower() == 'true'):
-                run.parent.cancel()
+            cancel_run = True
+
+        if(cancel_run and (allow_run_cancel).lower() == 'true'):
+            run.parent.cancel()
     else:
         print("This is the first model, "
               "thus it should be registered")
