@@ -29,7 +29,7 @@ variables:
   - name: DATASET_VERSION
     value: latest
   - name: TRAINING_PIPELINE_NAME
-    value: "MLOps-Training-Pipeline"
+    value: "Model-Train-Register-CI"
   - name: MODEL_NAME
     value: MLOps_model.pkl
 
