@@ -89,7 +89,7 @@ parser.add_argument(
 parser.add_argument(
     "--allow_run_cancel",
     type=str,
-    help="Set this to false to avoid evaluation step from cancelling",  
+    help="Set this to false to avoid evaluation step from cancelling",
     default="true",
 )
 
