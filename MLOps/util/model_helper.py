@@ -10,7 +10,7 @@ def get_current_workspace() -> Workspace:
     """
     Retrieves and returns the latest model from the workspace
     by its name and tag. Will not work when ran locally.
-    Parameters:
+    Parameters:get_latest_model
     None
     Return:
     The current workspace.
