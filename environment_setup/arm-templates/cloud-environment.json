@@ -12,7 +12,7 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "westeurope",
+      "defaultValue": "eastus",
       "allowedValues": [
         "eastus",
         "eastus2",
