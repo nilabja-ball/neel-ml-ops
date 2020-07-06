@@ -105,7 +105,7 @@ stages:
         inlineScript: |
           set -e # fail on error
           
-          az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(get_model.MODEL_VERSION)' \
+          az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$MLOps_model.pkl:2' \
           --compute-target $(AKS_COMPUTE_NAME) \
           --ic inference_config.yml \
           --dc deployment_config_aks.yml \
